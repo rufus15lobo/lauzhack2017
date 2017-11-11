@@ -4,35 +4,60 @@
     ViewData["Title"] = "MeetMyFriends";
 }
 
+<a id="showFriendForm" href="#">Add a new friend</a>
+
+<div id="addFriendFormDiv">
 <form>
     <div class="form-group">
-        <label for="travelDestination">Travel Destination</label>
-        <input type="text" class="form-control" id="travelDestination">
+        <label for="Name">Name</label>
+         <input type="text" class="form-control" id="Name">
     </div>
+    <div class="form-group">
+        <label for="Origin">Origin</label>
+        <input type="text" class="form-control" id="Origin">
+    </div>
+    <div class="checkbox">
+        <label>
+        <input type="checkbox">Return Journey
+        </label>
+    </div>
+    <div class="form-group">
+        <label for="DepartureDate">Departure Date</label>
+        <input type="text" class="form-control" id="DepartureDate">
+    </div>
+    <div class="form-group">
+        <label for="ReturnDate">Return Date</label>
+        <input type="text" class="form-control" id="ReturnDate">
+    </div>
+    <a href="#" id="addFriendToList">Add Friend to List</a>
 </form>
+</div>
 
-<table class="table">
+<table class="table" id="friendList">
     <thead>
-		<tr>
+        <tr>
             <th>#</th>
             <th>Name</th>
             <th>Origin</th>
             <th>OneWay or Return</th>
             <th>Departure Date</th>
             <th>Return Date</th>
-		</tr>
-	</thead>
-	<tbody>
+        </tr>
+    </thead>
+    <tbody>
     @{  var count = 0; }
-	@foreach (LauzHack_Skyscanner.Controllers.Friend friend in Model) {
-		count++;
+    @foreach (LauzHack_Skyscanner.Controllers.Friend friend in Model) {
+        count++;
         <tr>
-            <td></td>
-			<td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-		</tr>
-	}
-	</tbody>
+            <td>@count</td>
+            <td>@friend.Name</td>
+            <td>@friend.Origin</td>
+            <td>@friend.IsReturnJourney</td>
+            <td>@friend.DepartureDate</td>
+            <td>@friend.ReturnDate</td>
+        </tr>
+    }
+    </tbody>
 </table>
+
+<a href="#" id="getDestinationList"></a>

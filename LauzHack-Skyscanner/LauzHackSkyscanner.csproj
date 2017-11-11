@@ -17,5 +17,6 @@
     <Compile Remove="Controllers\AddFriend.cs" />
     <Compile Remove="MeetMyFriends\AddFriend.cs" />
     <Compile Remove="AddFriend.cs" />
+    <Compile Remove="Views\Home\AddFriend.cs" />
   </ItemGroup>
 </Project>

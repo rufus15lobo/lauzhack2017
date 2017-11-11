@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,10 +7,18 @@ namespace LauzHack_Skyscanner.Controllers
 {
     public class Friend
     {
-        string Name { get; set; }
+        public string Name { get; set; }
+        public string Origin { get; set; }
+        public bool IsReturnJourney { get; set; }
+        public DateTime DepartureDate { get; set; }
+        public DateTime ReturnDate { get; set; }
 
         public Friend() {
             Name = "Rufus";
+            Origin = "Basel";
+            IsReturnJourney = true;
+            DepartureDate = new DateTime(2017, 10, 27);
+            ReturnDate = new DateTime(2017, 10, 31);
         }
     }
 
@@ -25,7 +34,7 @@ namespace LauzHack_Skyscanner.Controllers
 
         public IActionResult AddFriend()
         {
-            return RedirectToAction("Index");    
+            return View();    
         }
 
         public IActionResult About()
