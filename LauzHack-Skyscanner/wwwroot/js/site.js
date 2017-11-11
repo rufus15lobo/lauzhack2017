@@ -1,5 +1,8 @@
 ﻿$(document).ready(function () {
 
+    $("#DepartureDate").datepicker({dateFormat: "yy-mm-dd"});
+    $("#ReturnDate").datepicker({dateFormat: "yy-mm-dd"});
+
     //TODO: Get destination visibility
     var friendList = [];
 
@@ -15,7 +18,11 @@
             friendTableHtml += "<td>" + friendList[i].serialNo + "</td>";
             friendTableHtml += "<td>" + friendList[i].name + "</td>";
             friendTableHtml += "<td>" + friendList[i].origin + "</td>";
-            friendTableHtml += "<td>" + friendList[i].isReturn + "</td>";
+            if (friendList[i].isReturn) {
+                friendTableHtml += "<td><input type='checkbox' disabled checked></td>";
+            } else {
+                friendTableHtml += "<td><input type='checkbox' disabled></td>";          
+            }
             friendTableHtml += "<td>" + friendList[i].departureDate + "</td>";
             friendTableHtml += "<td>" + friendList[i].returnDate + "</td>";
             friendTableHtml += "</tr>";
@@ -37,13 +44,15 @@
 
     $("#addFriendToList").click(function() {
         if(validateFriendDetails()) {
+ 
             var serialNo = friendList.length + 1;
-            alert(serialNo);
+            var isReturn = $("#IsReturn").is(":checked");
+
             var friend = {
                 serialNo: serialNo, 
                 name: $("#Name").val(), 
                 origin: $("#Origin").val(),
-                isReturn: $("#IsReturn").val(),
+                isReturn: isReturn,
                 departureDate: $("#DepartureDate").val(),
                 returnDate: $("#ReturnDate").val()
             };
