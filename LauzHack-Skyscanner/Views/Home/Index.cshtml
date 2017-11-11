@@ -4,6 +4,7 @@
     ViewData["Title"] = "MeetMyFriends";
 }
 
+<br/>
 <a id="showFriendForm" href="#">Add a new friend</a>
 
 <div id="addFriendFormDiv">
@@ -46,18 +47,23 @@
     </thead>
     <tbody>
     @{  var count = 0; }
-    @foreach (LauzHack_Skyscanner.Controllers.Friend friend in Model) {
-        count++;
-        <tr>
-            <td>@count</td>
-            <td>@friend.Name</td>
-            <td>@friend.Origin</td>
-            <td>@friend.IsReturnJourney</td>
-            <td>@friend.DepartureDate</td>
-            <td>@friend.ReturnDate</td>
-        </tr>
-    }
+	@if (Model.Count() > 0) 
+	{
+        foreach (LauzHack_Skyscanner.Controllers.Friend friend in Model) {
+            count++;
+            <tr>
+                <td>@count</td>
+                <td>@friend.Name</td>
+                <td>@friend.Origin</td>
+                <td>@friend.IsReturnJourney</td>
+                <td>@friend.DepartureDate</td>
+                <td>@friend.ReturnDate</td>
+            </tr>
+        }
+	} else {
+            <tr><td colspan="5">No friends added yet.</td></tr>
+	}
     </tbody>
 </table>
 
-<a href="#" id="getDestinationList"></a>
+<a href="#" id="getDestinationList">Get destination for travel</a>

@@ -37,17 +37,15 @@ namespace LauzHack_Skyscanner.Controllers
         public IActionResult Index()
         {
             List<Friend> friendList = new List<Friend>();
-            friendList.Add(new Friend());
+            // friendList.Add(new Friend());
 
             return View(friendList);
         }
 
         public List<string> AutoComplete()
         {
-            //TODO: Read request parameters to get input string for Origin Destination
-            var origin = "";
-
             List<string> originList = new List<string>();
+            //TODO: Read request parameters to get input string for Origin Location
             originList.Add("Response1");
             originList.Add("Response2");
             originList.Add("Response3");
@@ -57,13 +55,15 @@ namespace LauzHack_Skyscanner.Controllers
             return originList;
         }
 
-        public IActionResult Destinations()
+        public IActionResult Flights()
         {
             List<Friend> friendList = new List<Friend>();
             //TODO: Read list of friends from request parameters into List
             friendList.Add(new Friend());
             friendList.Add(new Friend());
             friendList.Add(new Friend());
+
+            //TODO: Logic to get flight details
 
             List<Destination> destinationList = new List<Destination>();
             destinationList.Add(new Destination());
