@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using NodaTime;
+using SkyScanner.Services;
+using SkyScanner.Data;
+using SkyScanner.Settings;
+using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.Extensions.Primitives;
 
 namespace LauzHack_Skyscanner.Controllers
 {
@@ -32,6 +39,20 @@ namespace LauzHack_Skyscanner.Controllers
         }
     }
 
+    public class FromPlace
+    {
+        public string Id { get; set; }
+        public string Label { get; set; }
+        public string Value { get; set; }
+
+        public FromPlace(string id, string label, string value)
+        {
+            Id = id;
+            Label = label;
+            Value = value;
+        }
+    }
+
     public class HomeController : Controller
     {
         public IActionResult Index()
@@ -42,17 +63,22 @@ namespace LauzHack_Skyscanner.Controllers
             return View(friendList);
         }
 
-        public List<string> AutoComplete()
+        public async Task<JsonResult> AutoComplete(string term)
         {
-            List<string> originList = new List<string>();
-            //TODO: Read request parameters to get input string for Origin Location
-            originList.Add("Response1");
-            originList.Add("Response2");
-            originList.Add("Response3");
+            var apikey = "ha104652488387353485173355756299";
+            var scanner = new Scanner(apikey);
+            List<SkyScanner.Data.Location> fromPlace = (await scanner.QueryLocation(term));
 
-            //TODO: Method call to SkyScanner here
+            List<FromPlace> fromPlaceJson = new List<FromPlace>();
 
-            return originList;
+            foreach (var location in fromPlace) {
+                var displayNameExtn = location.PlaceId.Split("-").First();
+                var displayName = location.PlaceName + " (" + displayNameExtn + ") - " + location.CountryName;
+                FromPlace fromPlaceObj = new FromPlace(location.PlaceId, displayName, displayName);
+                fromPlaceJson.Add(fromPlaceObj);
+            }
+
+            return Json(fromPlaceJson);
         }
 
         public IActionResult Flights()

@@ -1,7 +1,18 @@
 ﻿$(document).ready(function () {
 
+    // Datetime pickers
     $("#DepartureDate").datepicker({dateFormat: "yy-mm-dd"});
     $("#ReturnDate").datepicker({dateFormat: "yy-mm-dd"});
+
+    // Autocomplete for departure destination
+    var availableDestinations = [];
+    $("#Origin").autocomplete({
+      source: "/Home/Autocomplete/" + $("#Origin").val(),
+      minLength: 2,
+      select: function( event, ui ) {
+        alert("Option selected");
+      }
+    });
 
     //TODO: Get destination visibility
     var friendList = [];
