@@ -42,17 +42,17 @@
 
         for (var i=0; i<friendList.length; i++) {
             friendTableHtml += "<tr>";
-            friendTableHtml += "<td>" + friendList[i].serialNo + "</td>";
-            friendTableHtml += "<td>" + friendList[i].name + "</td>";
-            friendTableHtml += "<td>" + friendList[i].origin + "</td>";
-            friendTableHtml += "<td>" + friendList[i].destination + "</td>";
-            if (friendList[i].isReturn) {
+            friendTableHtml += "<td>" + friendList[i].SerialNo + "</td>";
+            friendTableHtml += "<td>" + friendList[i].Name + "</td>";
+            friendTableHtml += "<td>" + friendList[i].Origin + "</td>";
+            friendTableHtml += "<td>" + friendList[i].Destination + "</td>";
+            if (friendList[i].IsReturnJourney) {
                 friendTableHtml += "<td><input type='checkbox' disabled checked></td>";
             } else {
                 friendTableHtml += "<td><input type='checkbox' disabled></td>";          
             }
-            friendTableHtml += "<td>" + friendList[i].departureDate + "</td>";
-            friendTableHtml += "<td>" + friendList[i].returnDate + "</td>";
+            friendTableHtml += "<td>" + friendList[i].DepartureDate + "</td>";
+            friendTableHtml += "<td>" + friendList[i].ReturnDate + "</td>";
             friendTableHtml += "</tr>";
         }
 
@@ -87,15 +87,15 @@
             }
 
             var friend = {
-                serialNo: serialNo, 
-                name: $("#Name").val(), 
-                origin: $("#Origin").val(),
-                destination: $("#Destination").val(),
-                isReturn: isReturn,
-                departureDate: $("#DepartureDate").val(),
-                returnDate: $("#ReturnDate").val(),
-                originId: originValue,
-                destinationId: destinationValue
+                SerialNo: serialNo, 
+                Name: $("#Name").val(), 
+                Origin: $("#Origin").val(),
+                Destination: $("#Destination").val(),
+                IsReturnJourney: isReturn,
+                DepartureDate: $("#DepartureDate").val(),
+                ReturnDate: $("#ReturnDate").val(),
+                OriginId: originValue,
+                DestinationId: destinationValue
             };
 
             friendList.push(friend);
@@ -107,5 +107,37 @@
         }
     });
 
-    $("#getDestination").click();
+    $("#getDestinationList").click(function() {
+        //var friendListJSON = JSON.stringify(friendList);
+
+        var friendListJSON = "[";
+        for (var i=0; i<friendList.length; i++) {
+            if (i>0) 
+            {
+                friendListJSON += ",";
+            }
+            friendListJSON += "{";
+            friendListJSON += "\"SerialNo\": \"" + friendList[i].SerialNo + "\", ";
+            friendListJSON += "\"Name\": \"" + friendList[i].Name + "\", ";
+            friendListJSON += "\"Origin\": \"" + friendList[i].Origin + "\", ";
+            friendListJSON += "\"Destination\": \"" + friendList[i].Destination + "\", ";
+            friendListJSON += "\"IsReturnJourney\": " + friendList[i].IsReturnJourney + ", ";
+            friendListJSON += "\"DepartureDate\": \"" + friendList[i].DepartureDate + "\", ";
+            friendListJSON += "\"ReturnDate\": \"" + friendList[i].ReturnDate + "\", ";
+            friendListJSON += "\"OriginId\": \"" + friendList[i].OriginId + "\", ";
+            friendListJSON += "\"DestinationId\": \"" + friendList[i].DestinationId + "\"";
+            friendListJSON += "}";
+        }
+        friendListJSON += "]";
+
+        $.ajax({
+            method: "GET",
+            url: "/Home/Flights",
+            data: { friendList: friendListJSON },
+            success: function(data) {
+                $("html").html(data);
+            },
+            dataType: "html"
+        });
+    });
 });
