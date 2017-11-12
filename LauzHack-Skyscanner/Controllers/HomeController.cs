@@ -126,21 +126,23 @@ namespace LauzHack_Skyscanner.Controllers
                 if (friend.Destination == "everywhere" || friend.Destination == "anywhere")
                     try
                     {
-                        bestOptions.Add(friend.Name, RufusAnywhere(friend, friend.Destination).Result);
+                        bestOptions.Add(friend.Name, GoAnywhere(friend, friend.Destination).Result);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Console.WriteLine(e.StackTrace);
                         Task.Delay(delayMs).Wait();
                         continue;
                     }
                 else
                     try
                     {
-                        bestOptions.Add(friend.Name, Rufus(friend, friend.Destination).Result);
+                        bestOptions.Add(friend.Name, Go(friend, friend.DestinationId.Split('-')[0]).Result);
 
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Console.WriteLine(e.StackTrace);
                         Task.Delay(delayMs).Wait();
                         continue;
                     }
@@ -212,14 +214,14 @@ namespace LauzHack_Skyscanner.Controllers
             return commonBestPlaces;
         }
 
-        public async Task<Dictionary<string, BestResult>> Rufus(Friend friend, string destination)
+        public async Task<Dictionary<string, BestResult>> Go(Friend friend, string destination)
         {
             var scanner = new Scanner(apikey);
-            var fromPlace = (await scanner.QueryLocation(friend.Origin)).First();
+            var fromPlace = (await scanner.QueryLocation(friend.OriginId.Split('-')[0])).First();
             var toPlace = (await scanner.QueryLocation(destination)).First();
-            DateTime dptDate = DateTime.ParseExact(friend.DepartureDate, "yyyy-MM-dd HH:mm:tt", null);
+            DateTime dptDate = DateTime.ParseExact(friend.DepartureDate, "yyyy-MM-dd", null);
             LocalDate DepartureDate = new LocalDate(dptDate.Year, dptDate.Month, dptDate.Day);
-            DateTime retDate = DateTime.ParseExact(friend.ReturnDate, "yyyy-MM-dd HH:mm:tt", null);
+            DateTime retDate = DateTime.ParseExact(friend.ReturnDate, "yyyy-MM-dd", null);
             LocalDate ReturnDate = new LocalDate(dptDate.Year, dptDate.Month, dptDate.Day);
 
             //Query flights
@@ -255,14 +257,14 @@ namespace LauzHack_Skyscanner.Controllers
             return rufuses;
         }
 
-        public async Task<Dictionary<string, BestResult>> RufusAnywhere(Friend friend, string destination)
+        public async Task<Dictionary<string, BestResult>> GoAnywhere(Friend friend, string destination)
         {
             var scanner = new Scanner(apikey);
-            DateTime dptDate = DateTime.ParseExact(friend.DepartureDate, "yyyy-MM-dd HH:mm:tt", null);
+            DateTime dptDate = DateTime.ParseExact(friend.DepartureDate, "yyyy-MM-dd", null);
             LocalDate DepartureDate = new LocalDate(dptDate.Year, dptDate.Month, dptDate.Day);
-            DateTime retDate = DateTime.ParseExact(friend.ReturnDate, "yyyy-MM-dd HH:mm:tt", null);
+            DateTime retDate = DateTime.ParseExact(friend.ReturnDate, "yyyy-MM-dd", null);
             LocalDate ReturnDate = new LocalDate(dptDate.Year, dptDate.Month, dptDate.Day);
-            var query = (await scanner.QueryLocationById(friend.Origin, destination, DepartureDate.Year + "-" + DepartureDate.Month + "-" + DepartureDate.Day));
+            var query = (await scanner.QueryLocationById(friend.OriginId.Split('-')[0], destination, DepartureDate.Year + "-" + DepartureDate.Month + "-" + DepartureDate.Day));
 
             Dictionary<string, BestResult> rufuses = new Dictionary<string, BestResult>();
             List<Tuple<AnyPlace, AnyPlace>> places = GetAnyPlaces(takeValue, query.First());

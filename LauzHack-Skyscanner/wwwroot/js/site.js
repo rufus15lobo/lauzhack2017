@@ -11,22 +11,15 @@
       source: "/Home/Autocomplete/" + $("#Origin").val(),
       minLength: 2,
       select: function( event, ui ) {
-        alert("Option selected");
+          selectedOrigin = ui.item.id;
       }
     });
     var selectedDestination = "";
-    $("#Origin").autocomplete({
-      source: "/Home/Autocomplete/" + $("#Destination").val(),
-      minLength: 2,
-      select: function( event, ui ) {
-        alert("Option selected");
-      }
-    });
     $("#Destination").autocomplete({
       source: "/Home/Autocomplete/" + $("#Destination").val(),
       minLength: 2,
       select: function( event, ui ) {
-        alert("Option selected");
+          selectedDestination = ui.item.id;
       }
     });
 
