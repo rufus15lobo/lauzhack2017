@@ -10,17 +10,41 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Extensions.Primitives;
 
+using System.Runtime.Serialization.Json;
+using System.Runtime.Serialization;
+using Newtonsoft.Json;
+
 namespace LauzHack_Skyscanner.Controllers
 {
+    [DataContract]
     public class Friend
     {
+        [DataMember]
+        [JsonProperty]
+        public string SerialNo { get; set; }
+        [DataMember]
+        [JsonProperty]
         public string Name { get; set; }
+        [JsonProperty]
+        [DataMember]
         public string Origin { get; set; }
+        [DataMember]
+        [JsonProperty]
         public string Destination { get; set; }
+        [DataMember]
+        [JsonProperty]
         public bool IsReturnJourney { get; set; }
+        [DataMember]
+        [JsonProperty]
         public string DepartureDate { get; set; }
+        [DataMember]
+        [JsonProperty]
         public string ReturnDate { get; set; }
+        [DataMember]
+        [JsonProperty]
         public string OriginId { get; set; }
+        [DataMember]
+        [JsonProperty]
         public string DestinationId { get; set; }
 
         public Friend() {
@@ -45,12 +69,12 @@ namespace LauzHack_Skyscanner.Controllers
         }
     }
 
-    public class Destination
+    public class Flight
     {
         public string FriendName { get; set; }
         public string FlightId { get; set; }
 
-        public Destination() 
+        public Flight() 
         {
             //TODO: Constructor to instantiate a destination
         }
@@ -317,11 +341,8 @@ namespace LauzHack_Skyscanner.Controllers
 
         public IActionResult Flights()
         {
-            List<Friend> friendList = new List<Friend>();
-            //TODO: Read list of friends from request parameters into List
-            friendList.Add(new Friend());
-            friendList.Add(new Friend());
-            friendList.Add(new Friend());
+            var friendListFromQueryString = Request.Query.ElementAt(0).Value.ElementAt(0);
+            List<Friend> friendList = JsonConvert.DeserializeObject<List<Friend>>(friendListFromQueryString);
 
             Dictionary<string, Dictionary<string, BestResult>> bestOptions = CollectBestOptions(friendList);
             // We found all the places where the lists of friends match
@@ -330,12 +351,9 @@ namespace LauzHack_Skyscanner.Controllers
             // Now we pick the cheapest one
             Dictionary<string, BestResult> bestOfAll = GetBestOption(bestPlacesForAll, friendList, bestOptions);
 
-            List<Destination> destinationList = new List<Destination>();
-            destinationList.Add(new Destination());
-            destinationList.Add(new Destination());
-            destinationList.Add(new Destination());
+            List<Flight> flightList = new List<Flight>();
 
-            return View(new Tuple<IEnumerable<Friend>, IEnumerable<Destination>>(friendList, destinationList));    
+            return View(new Tuple<IEnumerable<Friend>, IEnumerable<Flight>>(friendList, flightList));    
         }
 
         public IActionResult TestRunPythonScript()
