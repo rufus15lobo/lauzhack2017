@@ -133,4 +133,39 @@
             dataType: "html"
         });
     });
+
+    $("#getConnectionList").click(function() {
+        //var friendListJSON = JSON.stringify(friendList);
+
+        var friendListJSON = "[";
+        for (var i=0; i<friendList.length; i++) {
+            if (i>0) 
+            {
+                friendListJSON += ",";
+            }
+            friendListJSON += "{";
+            friendListJSON += "\"SerialNo\": \"" + friendList[i].SerialNo + "\", ";
+            friendListJSON += "\"Name\": \"" + friendList[i].Name + "\", ";
+            friendListJSON += "\"Origin\": \"" + friendList[i].Origin + "\", ";
+            friendListJSON += "\"Destination\": \"" + friendList[i].Destination + "\", ";
+            friendListJSON += "\"IsReturnJourney\": " + friendList[i].IsReturnJourney + ", ";
+            friendListJSON += "\"DepartureDate\": \"" + friendList[i].DepartureDate + "\", ";
+            friendListJSON += "\"ReturnDate\": \"" + friendList[i].ReturnDate + "\", ";
+            friendListJSON += "\"OriginId\": \"" + friendList[i].OriginId + "\", ";
+            friendListJSON += "\"DestinationId\": \"" + friendList[i].DestinationId + "\"";
+            friendListJSON += "}";
+        }
+        friendListJSON += "]";
+
+        $.ajax({
+            method: "GET",
+            url: "/Home/Connections",
+            data: { friendList: friendListJSON },
+            success: function(data) {
+                $("html").html(data);
+            },
+            dataType: "html"
+        });
+    });
+
 });

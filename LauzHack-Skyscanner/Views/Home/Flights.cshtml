@@ -5,9 +5,31 @@
 @{
 }
 
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<p>The list of destinations shall be displayed on this page.</p> 
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Friend Name</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Price</th>
+            <th>Offer Details</th>
+		</tr>
+	</thead>
+    <tbody>
+		@if (@Model.Item2.Count > 0) {
+		    for (var i=0; i<@Model.Item2.Count; i++) {
+        <tr>
+            <td>@Model.Item2[i].FriendName</td>
+            <td>@Model.Item2[i].Origin</td>
+            <td>@Model.Item2[i].Destination</td>
+            <td>@Model.Item2[i].Price</td>
+            <td><a href="@Model.Item2[i].DeepLink">Offer Details</a></td>
+        </tr>
+		    }
+		} else {
+        <tr>
+            <td colspan="5">No flights found :( </td>
+		</tr>
+		}
+    </tbody>
+</table>
