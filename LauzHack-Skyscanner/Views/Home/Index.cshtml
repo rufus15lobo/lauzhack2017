@@ -17,6 +17,10 @@
         <label for="Origin">Origin</label>
         <input type="text" class="form-control" id="Origin">
     </div>
+    <div class="form-group">
+        <label for="Destination">Destination</label>
+        <input type="text" class="form-control" id="Destination">
+    </div>
     <div class="checkbox">
         <label>
         <input type="checkbox" id="IsReturn">Return Journey
@@ -40,6 +44,7 @@
             <th>#</th>
             <th>Name</th>
             <th>Origin</th>
+			<th>Destination</th>
             <th>OneWay or Return</th>
             <th>Departure Date</th>
             <th>Return Date</th>
@@ -55,6 +60,7 @@
                 <td>@count</td>
                 <td>@friend.Name</td>
                 <td>@friend.Origin</td>
+			    <td>@friend.Destination</td>
                 <td>@friend.IsReturnJourney</td>
                 <td>@friend.DepartureDate</td>
                 <td>@friend.ReturnDate</td>

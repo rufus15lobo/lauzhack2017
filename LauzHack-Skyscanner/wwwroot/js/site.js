@@ -6,8 +6,24 @@
 
     // Autocomplete for departure destination
     var availableDestinations = [];
+    var selectedOrigin = "";
     $("#Origin").autocomplete({
       source: "/Home/Autocomplete/" + $("#Origin").val(),
+      minLength: 2,
+      select: function( event, ui ) {
+        alert("Option selected");
+      }
+    });
+    var selectedDestination = "";
+    $("#Origin").autocomplete({
+      source: "/Home/Autocomplete/" + $("#Destination").val(),
+      minLength: 2,
+      select: function( event, ui ) {
+        alert("Option selected");
+      }
+    });
+    $("#Destination").autocomplete({
+      source: "/Home/Autocomplete/" + $("#Destination").val(),
       minLength: 2,
       select: function( event, ui ) {
         alert("Option selected");
@@ -29,6 +45,7 @@
             friendTableHtml += "<td>" + friendList[i].serialNo + "</td>";
             friendTableHtml += "<td>" + friendList[i].name + "</td>";
             friendTableHtml += "<td>" + friendList[i].origin + "</td>";
+            friendTableHtml += "<td>" + friendList[i].destination + "</td>";
             if (friendList[i].isReturn) {
                 friendTableHtml += "<td><input type='checkbox' disabled checked></td>";
             } else {
@@ -58,14 +75,27 @@
  
             var serialNo = friendList.length + 1;
             var isReturn = $("#IsReturn").is(":checked");
+            var originValue = $("#Origin").val();
+            if (selectedOrigin != "")
+            {
+                originValue = selectedOrigin;
+            }
+            var destinationValue = $("#Destination").val();
+            if (selectedDestination != "")
+            {
+                destinationValue = selectedDestination;
+            }
 
             var friend = {
                 serialNo: serialNo, 
                 name: $("#Name").val(), 
                 origin: $("#Origin").val(),
+                destination: $("#Destination").val(),
                 isReturn: isReturn,
                 departureDate: $("#DepartureDate").val(),
-                returnDate: $("#ReturnDate").val()
+                returnDate: $("#ReturnDate").val(),
+                originId: originValue,
+                destinationId: destinationValue
             };
 
             friendList.push(friend);
