@@ -4,6 +4,13 @@
     $("#DepartureDate").datepicker({dateFormat: "yy-mm-dd"});
     $("#ReturnDate").datepicker({dateFormat: "yy-mm-dd"});
 
+    // Visibility
+    $("#getFlights").hide();
+    $("#getConnections").hide();
+    $("#addFriendFormDiv").hide();
+    $("#showFriendForm").show();
+    $("#friendList").show();
+
     // Autocomplete for departure destination
     var availableDestinations = [];
     var selectedOrigin = "";
@@ -25,6 +32,8 @@
 
     //TODO: Get destination visibility
     var friendList = [];
+    var flightList = [];
+    var connectionList = [];
 
     function validateFriendDetails() {
         return true;
@@ -52,9 +61,37 @@
         $("#friendList > tbody").html(friendTableHtml);
     }
 
-    $("#addFriendFormDiv").hide();
-    $("#showFriendForm").show();
-    $("#friendList").show();
+    function repopulateFlightListTable() {
+        var flightTableHtml = "";
+
+        for (var i = 0; i < flightList.length; i++) {
+            flightTableHtml += "<tr>";
+            flightTableHtml += "<td>" + flightList[i].friendName + "</td>";
+            flightTableHtml += "<td>" + flightList[i].origin + "</td>";
+            flightTableHtml += "<td>" + flightList[i].destination + "</td>";
+            flightTableHtml += "<td>" + flightList[i].price + "</td>";
+            flightTableHtml += "<td><a href='" + flightList[i].deepLink + "' target='_blank'>View offer</a></td>";
+            flightTableHtml += "</tr>";
+        }
+
+        $("#getFlights > tbody").html(flightTableHtml);
+    }
+
+    function repopulateConnectionsListTable() {
+        var connectionTableHtml = "";
+
+        for (var i = 0; i < connectionList.length; i++) {
+            connectionTableHtml += "<tr>";
+            connectionTableHtml += "<td>" + connectionList[i].friendName + "</td>";
+            connectionTableHtml += "<td>" + connectionList[i].origin + "</td>";
+            connectionTableHtml += "<td>" + connectionList[i].destination + "</td>";
+            connectionTableHtml += "<td>" + connectionList[i].price + "</td>";
+            connectionTableHtml += "<td><a href='" + connectionList[i].deepLink + "' target='_blank'>View offer</a></td>";
+            connectionTableHtml += "</tr>";
+        }
+
+        $("#getConnections > tbody").html(connectionTableHtml);
+    }
 
     $("#addFriendFormDiv").click();
 
@@ -127,8 +164,10 @@
             method: "GET",
             url: "/Home/Flights",
             data: { friendList: friendListJSON },
-            success: function(data) {
-                $("html").html(data);
+            success: function (data) {
+                $("#getFlights").show();
+                flightList = JSON.parse(data);
+                repopulateFlightListTable();
             },
             dataType: "html"
         });
@@ -161,8 +200,10 @@
             method: "GET",
             url: "/Home/Connections",
             data: { friendList: friendListJSON },
-            success: function(data) {
-                $("html").html(data);
+            success: function (data) {
+                $("#getConnections").show();
+                connectionList = JSON.parse(data);
+                repopulateConnectionsListTable();
             },
             dataType: "html"
         });

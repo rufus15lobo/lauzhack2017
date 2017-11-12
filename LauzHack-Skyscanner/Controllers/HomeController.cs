@@ -47,7 +47,8 @@ namespace LauzHack_Skyscanner.Controllers
         [JsonProperty]
         public string DestinationId { get; set; }
 
-        public Friend() {
+        public Friend()
+        {
             Name = "Rufus";
             Origin = "Basel";
             Destination = "Anywhere";
@@ -69,6 +70,75 @@ namespace LauzHack_Skyscanner.Controllers
         }
     }
 
+    public class Destination
+    {
+        //TODO: Add destination properties here
+        public SkyScanner.Data.Location Dest { get; set; }
+        public Destination(SkyScanner.Data.Location dest)
+        {
+            Dest = dest;
+            //TODO: Constructor to instantiate a destination
+        }
+    }
+    public class SegmentCheck
+    {
+        public SkyScanner.Booking.BookingResponse SegBooking { get; set; }
+        public List<LegSegment> SegSegments { get; set; }
+        public Friend SegFriend { get; set; }
+        public SegmentCheck(SkyScanner.Booking.BookingResponse booking, List<LegSegment> segments, Friend friend)
+        {
+            SegBooking = booking;
+            SegSegments = segments;
+            SegFriend = friend;
+        }
+        public SegmentCheck()
+        {
+        }
+    }
+    public class Flight1
+    {
+        //TODO: Add flights properties here
+        public Friend flightFriend { get; set; }
+        public Destination flightDestination { get; set; }
+        List<LocalDate> departure { get; set; }
+        List<LocalDate> arrival { get; set; }
+        public Flight1(Friend friend, Destination destination)
+        {
+            flightFriend = friend;
+            flightDestination = destination;
+            //TODO: Constructor to instantiate a flights
+
+
+        }
+        static string apikey = "ha104652488387353485173355756299";
+
+
+        public async Task<List<SegmentCheck>> scan()
+        {
+            var scanner = new Scanner(apikey);
+            //Query flights
+            DateTime dptDate = DateTime.ParseExact(flightFriend.DepartureDate, "yyyy-MM-dd", null);
+            LocalDate DepartureDate = new LocalDate(dptDate.Year, dptDate.Month, dptDate.Day);
+
+            var itineraries = await scanner.QueryFlight(
+              new FlightQuerySettings(
+                new FlightRequestSettings(
+                  SkyScanner.Data.Location.FromString(flightFriend.OriginId), flightDestination.Dest,
+                  DepartureDate),
+                new FlightResponseSettings(SortType.Price, SortOrder.Ascending)));
+
+            List<SegmentCheck> returnSegments = new List<SegmentCheck>();
+            foreach (var itinerary in itineraries)
+            {
+                var booking = await scanner.QueryBooking(itinerary);
+
+                SegmentCheck segments = new SegmentCheck(booking, itinerary.OutboundLeg.Segments, flightFriend);
+                returnSegments.Add(segments);
+            }
+            return returnSegments;
+        }
+    }
+
     public class Flight
     {
         public string FriendName { get; set; }
@@ -77,7 +147,7 @@ namespace LauzHack_Skyscanner.Controllers
         public string Origin { get; set; }
         public string Destination { get; set; }
 
-        public Flight() 
+        public Flight()
         {
         }
 
@@ -107,7 +177,7 @@ namespace LauzHack_Skyscanner.Controllers
 
     public class HomeController : Controller
     {
-        static int takeValue = 30;
+        static int takeValue = 5;
         static int delayMs = 500;
         string apikey = "ha104652488387353485173355756299";
 
@@ -339,7 +409,8 @@ namespace LauzHack_Skyscanner.Controllers
 
             List<FromPlace> fromPlaceJson = new List<FromPlace>();
 
-            foreach (var location in fromPlace) {
+            foreach (var location in fromPlace)
+            {
                 var displayNameExtn = location.PlaceId.Split("-").First();
                 var displayName = location.PlaceName + " (" + displayNameExtn + ") - " + location.CountryName;
                 FromPlace fromPlaceObj = new FromPlace(location.PlaceId, displayName, displayName);
@@ -349,7 +420,7 @@ namespace LauzHack_Skyscanner.Controllers
             return Json(fromPlaceJson);
         }
 
-        public IActionResult Flights()
+        public JsonResult Flights()
         {
             var friendListFromQueryString = Request.Query.ElementAt(0).Value.ElementAt(0);
             List<Friend> friendList = JsonConvert.DeserializeObject<List<Friend>>(friendListFromQueryString);
@@ -362,23 +433,259 @@ namespace LauzHack_Skyscanner.Controllers
             Dictionary<string, BestResult> bestOfAll = GetBestOption(bestPlacesForAll, friendList, bestOptions);
 
             List<Flight> flightList = new List<Flight>();
-            foreach(var instance in bestOfAll)
+            foreach (var instance in bestOfAll)
             {
                 flightList.Add(new Flight(instance.Key, instance.Value.DeepLink.ToString(), instance.Value.ActualPrice.ToString(), instance.Value.OriginStation.ToString(), instance.Value.DestinationStation.ToString()));
             }
 
-            return View(new Tuple<IEnumerable<Friend>, IEnumerable<Flight>>(friendList, flightList));    
+            //List<Flight> flightList = new List<Flight>();
+            //flightList.Add(new Flight("123", "shit", "123", "so", "os"));
+
+            return Json(flightList);
         }
 
-        public IActionResult Connections()
+        public static void Swap<T>(IList<T> list, int indexA, int indexB)
+        {
+            T tmp = list[indexA];
+            list[indexA] = list[indexB];
+            list[indexB] = tmp;
+        }
+
+        public JsonResult Connections()
         {
             var friendListFromQueryString = Request.Query.ElementAt(0).Value.ElementAt(0);
             List<Friend> friendList = JsonConvert.DeserializeObject<List<Friend>>(friendListFromQueryString);
 
-            //TODO: Patrick have your way here
+            bool three = true;
+            bool four = true;
+            //List<Friend> friendList = new List<Friend>();
+            int numDudes = friendList.Count;
+            if (numDudes > 4) numDudes = 4;
 
-            return View(friendList);
+            for (int i = 0; i < 4; i++)
+            {
+                friendList.Add(new Friend());
+            }
+            //TODO: Read list of friends from request parameters into List
+
+            Destination dest = new Destination(SkyScanner.Data.Location.FromString("LED"));
+            Destination dest2 = new Destination(SkyScanner.Data.Location.FromString("HKG"));
+            //TODO: Logic to get flight details
+            List<Flight1> flightsList = new List<Flight1>();
+            for (int i = 0; i < 4; i++)
+            {
+                flightsList.Add(new Flight1(friendList[0], dest));
+            }
+            //foreach (Friend friend in friendList)
+            //{
+            flightsList[0] = (new Flight1(friendList[0], dest));
+            flightsList[1] = (new Flight1(friendList[1], dest));
+            flightsList[2] = (new Flight1(friendList[2], dest));
+            flightsList[3] = (new Flight1(friendList[3], dest));
+            //}
+            List<List<SegmentCheck>> allSegments = new List<List<SegmentCheck>>();
+            for (int i = 0; i < 4; i++)
+            {
+                allSegments.Add(new List<SegmentCheck>());
+            }
+            Parallel.For(0, numDudes, index =>
+            {
+                List<SegmentCheck> segments = flightsList[index].scan().Result;
+                for (int i = 0; i < numDudes; i++)
+                {
+                    if (segments.First().SegFriend.Name == friendList[i].Name)
+                    {
+                        allSegments[i] = segments;
+                    }
+                }
+
+
+            });
+
+            SegmentCheck dummy = new SegmentCheck();
+            List<Tuple<SegmentCheck, SegmentCheck, SegmentCheck, SegmentCheck>> tuples = new List<Tuple<SegmentCheck, SegmentCheck, SegmentCheck, SegmentCheck>>();
+            foreach (var x in allSegments[0])
+            {
+                foreach (var y in allSegments[1])
+                {
+                    if (!allSegments[2].Any())
+                    {
+                        three = false;
+                        four = false;
+                        foreach (var seg1 in x.SegSegments)
+                        {
+                            foreach (var seg2 in y.SegSegments)
+                            {
+                                if (seg1.Flight.FlightNumber == seg2.Flight.FlightNumber)
+                                {
+                                    tuples.Add(Tuple.Create(x, y, dummy, dummy));
+                                }
+                            }
+                        }
+                    }
+                    foreach (var z in allSegments[2])
+                    {
+                        if (!allSegments[3].Any())
+                        {
+                            four = false;
+                            foreach (var seg1 in x.SegSegments)
+                            {
+                                foreach (var seg2 in y.SegSegments)
+                                {
+                                    foreach (var seg3 in z.SegSegments)
+                                    {
+                                        if (seg1.Flight.FlightNumber == seg2.Flight.FlightNumber)
+                                        {
+                                            if (seg2.Flight.FlightNumber == seg3.Flight.FlightNumber)
+                                            {
+                                                tuples.Add(Tuple.Create(x, y, z, dummy));
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                        foreach (var w in allSegments[3])
+                        {
+                            foreach (var seg1 in x.SegSegments)
+                            {
+                                foreach (var seg2 in y.SegSegments)
+                                {
+                                    if (!z.SegSegments.Any())
+                                    {
+                                        if (seg1.Flight.FlightNumber == seg2.Flight.FlightNumber)
+                                        {
+                                            tuples.Add(Tuple.Create(x, y, dummy, dummy));
+                                        }
+                                    }
+                                    foreach (var seg3 in z.SegSegments)
+                                    {
+                                        if (!w.SegSegments.Any())
+                                        {
+                                            if (seg1.Flight.FlightNumber == seg2.Flight.FlightNumber)
+                                            {
+                                                if (seg2.Flight.FlightNumber == seg3.Flight.FlightNumber)
+                                                {
+                                                    tuples.Add(Tuple.Create(x, y, z, dummy));
+                                                }
+                                            }
+                                        }
+                                        foreach (var seg4 in w.SegSegments)
+                                        {
+                                            if (seg1.Flight.FlightNumber == seg2.Flight.FlightNumber)
+                                            {
+                                                if (seg2.Flight.FlightNumber == seg3.Flight.FlightNumber)
+                                                {
+                                                    if (seg3.Flight.FlightNumber == seg4.Flight.FlightNumber)
+                                                    {
+                                                        tuples.Add(Tuple.Create(x, y, z, w));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            Tuple<SegmentCheck, SegmentCheck, SegmentCheck, SegmentCheck> finalTuple = tuples[0];
+            double currSum = 10000000000;
+            double lowest1 = 10000000000;
+            double lowest2 = 10000000000;
+            double lowest3 = 10000000000;
+            double lowest4 = 10000000000;
+            foreach (Tuple<SegmentCheck, SegmentCheck, SegmentCheck, SegmentCheck> tup in tuples)
+            {
+                double price1 = (double)tup.Item1.SegBooking.Itinerary.PricingOptions.First().Price;
+                double price2 = (double)tup.Item2.SegBooking.Itinerary.PricingOptions.First().Price;
+                double price3 = 0;
+                double price4 = 0;
+                if (three)
+                {
+                    price3 = (double)tup.Item3.SegBooking.Itinerary.PricingOptions.First().Price;
+                }
+                if (four)
+                {
+                    price4 = (double)tup.Item4.SegBooking.Itinerary.PricingOptions.First().Price;
+                }
+
+                double sum = price1 + price2 + price3 + price4;
+                if (sum < currSum)
+                {
+                    currSum = sum;
+                    finalTuple = tup;
+                }
+                if (price1 < lowest1)
+                {
+                    lowest1 = price1;
+                }
+                if (price2 < lowest2)
+                {
+                    lowest2 = price2;
+                }
+                if (price3 < lowest3)
+                {
+                    lowest3 = price3;
+                }
+                if (price4 < lowest4)
+                {
+                    lowest4 = price4;
+                }
+            }
+            List<double> priceList = new List<double>();
+            priceList.Add(lowest1);
+            priceList.Add(lowest2);
+            priceList.Add(lowest3);
+            priceList.Add(lowest4);
+            /*Console.WriteLine("Friend 1 lowest price: " + lowest1 + " Friend 2 lowest price: " + lowest2 + " Friend 3 lowest price: " + lowest3 + " Friend 4 lowest price: " + lowest4 + "lowest sum: " + currSum);
+            Console.WriteLine(finalTuple.Item1.SegFriend.Name + ": ");
+            Console.WriteLine(finalTuple.Item1.SegBooking.BookingOptions.First().BookingItems.First().DeepLink);
+            Console.WriteLine(finalTuple.Item2.SegFriend.Name + ": ");
+            Console.WriteLine(finalTuple.Item2.SegBooking.BookingOptions.First().BookingItems.First().DeepLink);
+            */
+            List<string> linkList = new List<string>();
+            List<string> nameList = new List<string>();
+            List<string> origList = new List<string>();
+            linkList.Add(finalTuple.Item1.SegBooking.BookingOptions.First().BookingItems.First().DeepLink.ToString());
+            linkList.Add(finalTuple.Item2.SegBooking.BookingOptions.First().BookingItems.First().DeepLink.ToString());
+            nameList.Add(finalTuple.Item1.SegFriend.Name);
+            nameList.Add(finalTuple.Item2.SegFriend.Name);
+            origList.Add(finalTuple.Item1.SegFriend.Origin);
+            origList.Add(finalTuple.Item2.SegFriend.Origin);
+            if (three)
+            {
+                linkList.Add(finalTuple.Item3.SegBooking.BookingOptions.First().BookingItems.First().DeepLink.ToString());
+                nameList.Add(finalTuple.Item3.SegFriend.Name);
+                origList.Add(finalTuple.Item3.SegFriend.Origin);
+            }
+            if (four)
+            {
+                linkList.Add(finalTuple.Item4.SegBooking.BookingOptions.First().BookingItems.First().DeepLink.ToString());
+                nameList.Add(finalTuple.Item4.SegFriend.Name);
+                origList.Add(finalTuple.Item4.SegFriend.Origin);
+            }
+
+
+            List<Flight> connectionList = new List<Flight>();
+            for (int i = 0; i < numDudes; i++)
+            {
+                Flight reFlight = new Flight();
+                reFlight.DeepLink = linkList[i];
+                reFlight.Destination = finalTuple.Item1.SegFriend.Destination;
+                reFlight.FriendName = nameList[i];
+                reFlight.Origin = origList[i];
+                reFlight.Price = priceList[i].ToString();
+                connectionList.Add(reFlight);
+            }
+
+            return Json(connectionList);
         }
+
 
         public IActionResult TestRunPythonScript()
         {
