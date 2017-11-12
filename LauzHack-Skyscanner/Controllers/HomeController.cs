@@ -72,11 +72,22 @@ namespace LauzHack_Skyscanner.Controllers
     public class Flight
     {
         public string FriendName { get; set; }
-        public string FlightId { get; set; }
+        public string DeepLink { get; set; }
+        public string Price { get; set; }
+        public string Origin { get; set; }
+        public string Destination { get; set; }
 
         public Flight() 
         {
-            //TODO: Constructor to instantiate a destination
+        }
+
+        public Flight(string friendName, string deepLink, string price, string origin, string destination)
+        {
+            FriendName = friendName;
+            DeepLink = deepLink;
+            Price = price;
+            Origin = origin;
+            Destination = destination;
         }
     }
 
@@ -104,9 +115,6 @@ namespace LauzHack_Skyscanner.Controllers
         public IActionResult Index()
         {
             List<Friend> friendList = new List<Friend>();
-            friendList.Add(new Friend());
-            friendList.Add(new Friend("Patrick", "Munich", "Moscow", true, DateTime.Today.ToString(), DateTime.Today.AddDays(10).ToString(), "MUC", "SVO"));
-
             return View(friendList);
         }
 
@@ -115,7 +123,7 @@ namespace LauzHack_Skyscanner.Controllers
             Dictionary<string, Dictionary<string, BestResult>> bestOptions = new Dictionary<string, Dictionary<string, BestResult>>();
             foreach (var friend in friendList)
             {
-                if (friend.Destination == "everywhere")
+                if (friend.Destination == "everywhere" || friend.Destination == "anywhere")
                     try
                     {
                         bestOptions.Add(friend.Name, RufusAnywhere(friend, friend.Destination).Result);
@@ -352,6 +360,10 @@ namespace LauzHack_Skyscanner.Controllers
             Dictionary<string, BestResult> bestOfAll = GetBestOption(bestPlacesForAll, friendList, bestOptions);
 
             List<Flight> flightList = new List<Flight>();
+            foreach(var instance in bestOfAll)
+            {
+                flightList.Add(new Flight(instance.Key, instance.Value.DeepLink.ToString(), instance.Value.ActualPrice.ToString(), instance.Value.OriginStation.ToString(), instance.Value.DestinationStation.ToString()));
+            }
 
             return View(new Tuple<IEnumerable<Friend>, IEnumerable<Flight>>(friendList, flightList));    
         }
