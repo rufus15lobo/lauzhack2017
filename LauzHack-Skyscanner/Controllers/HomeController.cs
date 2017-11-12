@@ -368,6 +368,16 @@ namespace LauzHack_Skyscanner.Controllers
             return View(new Tuple<IEnumerable<Friend>, IEnumerable<Flight>>(friendList, flightList));    
         }
 
+        public IActionResult Connections()
+        {
+            var friendListFromQueryString = Request.Query.ElementAt(0).Value.ElementAt(0);
+            List<Friend> friendList = JsonConvert.DeserializeObject<List<Friend>>(friendListFromQueryString);
+
+            //TODO: Patrick have your way here
+
+            return View(friendList);
+        }
+
         public IActionResult TestRunPythonScript()
         {
             ViewData["Output"] = "Put output from python as a string here";
